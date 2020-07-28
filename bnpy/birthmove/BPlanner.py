@@ -5,6 +5,8 @@ from collections import defaultdict
 from . import BLogger
 from bnpy.viz.PrintTopics import vec2str
 from bnpy.util import argsort_bigtosmall_stable, argsortBigToSmallByTiers
+import pdb
+
 
 def selectCompsForBirthAtCurrentBatch(
         hmodel=None,
@@ -90,8 +92,7 @@ def selectCompsForBirthAtCurrentBatch(
         if uid not in MoveRecordsByUID:
             MoveRecordsByUID[uid] = defaultdict(int)
         if not isinstance(MoveRecordsByUID[uid]['byBatch'], dict):
-            MoveRecordsByUID[uid]['byBatch'] = \
-                defaultdict(lambda: defaultdict(int))
+            MoveRecordsByUID[uid]['byBatch'] = defaultdict(lambda: defaultdict(int))
         uidRec = MoveRecordsByUID[uid]
         uidRec_b = MoveRecordsByUID[uid]['byBatch'][batchID]
 

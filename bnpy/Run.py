@@ -160,15 +160,13 @@ def _run_task_internal(jobname, taskid, nTask,
     if hasattr(Data, 'name'):
         ReqArgs['dataName'] = Data.name
     if doSaveToDisk:
-        task_output_path = make_task_output_path(
-            ReqArgs, KwArgs, taskID=taskid)
+        task_output_path = make_task_output_path(ReqArgs, KwArgs, taskID=taskid)
         createEmptyOutputPathOnDisk(task_output_path)
         writeArgsToFile(ReqArgs, KwArgs, task_output_path, UnkArgs)
     else:
         task_output_path = None
     KwArgs['OutputPrefs']['task_output_path'] = task_output_path
-    jobID = configLoggingToConsoleAndFile(
-        task_output_path, taskid, doSaveToDisk, doWriteStdOut)
+    jobID = configLoggingToConsoleAndFile(task_output_path, taskid, doSaveToDisk, doWriteStdOut)
 
     # Write descriptions to the log
     if taskid == 1 or jobID > 0:
@@ -212,11 +210,9 @@ def _run_task_internal(jobname, taskid, nTask,
 
     # Set up logging for how long each step of the alg takes.
     import bnpy.learnalg.ElapsedTimeLogger as ElapsedTimeLogger
-    ElapsedTimeLogger.configure(
-        task_output_path, KwArgs['MoveNames'], doSaveToDisk, doWriteStdOut)
+    ElapsedTimeLogger.configure(task_output_path, KwArgs['MoveNames'], doSaveToDisk, doWriteStdOut)
 
-    Log.info(
-        'Learn Alg: %s | task %2d/%d | alg. seed: %d | data order seed: %d'
+    Log.info('Learn Alg: %s | task %2d/%d | alg. seed: %d | data order seed: %d'
         % (algName, taskid, nTask, algseed, dataorderseed))
     Log.info('task_output_path: %s' % (task_output_path))
 
@@ -316,13 +312,11 @@ def getKwArgsForLoadData(ReqArgs, UnkArgs, KwArgs=dict()):
         for name in names:
             dataArgNames.add(name)
     if hasattr(datamod, 'get_iterator'):
-        names, varargs, varkw, defaults = inspect.getargspec(
-            datamod.get_iterator)
+        names, varargs, varkw, defaults = inspect.getargspec(datamod.get_iterator)
         for name in names:
             dataArgNames.add(name)
     if hasattr(datamod, 'to_iterator'):
-        names, varargs, varkw, defaults = inspect.getargspec(
-            datamod.to_iterator)
+        names, varargs, varkw, defaults = inspect.getargspec(datamod.to_iterator)
         for name in names:
             dataArgNames.add(name)
     if hasattr(datamod, 'Defaults'):
@@ -398,8 +392,7 @@ def make_initialized_model(
     return hmodel
 
 
-def createLearnAlg(
-        Data, model, ReqArgs, KwArgs, algseed=0, task_output_path=None):
+def createLearnAlg(Data, model, ReqArgs, KwArgs, algseed=0, task_output_path=None):
     ''' Creates a bnpy LearnAlg object for the given Data and model.
 
         This object is responsible for:

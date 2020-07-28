@@ -40,6 +40,7 @@ Set the "dataorderseed" parameter to get repeatable orders.
 """
 from builtins import *
 import numpy as np
+import pdb
 MAXSEED = 1000000
 
 
@@ -125,6 +126,7 @@ class DataIterator(object):
         self.DataPerBatch = list()
         self.IDsPerBatch = list()
         for b in range(nBatch):
+            pdb.set_trace()
             curBatchMask = shuffleIDs[:nUnitPerBatch[b]]
             Dchunk = Data.make_subset(curBatchMask, doTrackTruth=alwaysTrackTruth)
             Dchunk.alwaysTrackTruth = alwaysTrackTruth

@@ -44,7 +44,7 @@ for ii in range(num_regime):
 
     noise = np.random.normal(0, regime_noise[ii], np.sum(mask)) + regime_loc[ii]
     obs[mask] += noise
-obs[1000] = 10000
+# obs[1000] = 10000
 # pylab.plot(obs)
 
 dataset =bnpy.data.XData(obs.reshape(-1,1))

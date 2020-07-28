@@ -1,6 +1,7 @@
 from builtins import *
 import numpy as np
 import os
+import pdb
 
 from . import BLogger
 from collections import defaultdict
@@ -41,9 +42,7 @@ def makeSummariesForManyBirthProposals(
     if b_targetUIDs is None:
         b_targetUIDs = MovePlans['b_targetUIDs']
     if len(b_targetUIDs) > 0:
-        BLogger.pprint(
-            'CREATING birth proposals at lap %.2f batch %d' % (
-                lapFrac, batchID))
+        BLogger.pprint('CREATING birth proposals at lap %.2f batch %d' % (lapFrac, batchID))
     if xSSProposalsByUID is None:
         xSSProposalsByUID = dict()
     failedUIDs = list()
@@ -67,6 +66,7 @@ def makeSummariesForManyBirthProposals(
             lapFrac=lapFrac,
             batchID=batchID,
             **BArgs)
+
         if xSSslice is not None:
             # Proposal successful, with at least 2 non-empty clusters.
             # Move on to the evaluation stage!
