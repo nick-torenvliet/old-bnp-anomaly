@@ -13,11 +13,11 @@ import bnpy
 import numpy as np
 import os
 
-from matplotlib import pylab
+import matplotlib.pyplot as plt
 import seaborn as sns
 
 FIG_SIZE = (3, 3)
-pylab.rcParams['figure.figsize'] = FIG_SIZE
+plt.rcParams['figure.figsize'] = FIG_SIZE
 
 ###############################################################################
 #
@@ -32,11 +32,12 @@ dataset = bnpy.data.XData.read_csv(
 #
 # Make a simple plot of the raw data
 
-pylab.plot(dataset.X[:, 0], dataset.X[:, 1], 'k.')
-pylab.xlabel(dataset.column_names[0])
-pylab.ylabel(dataset.column_names[1])
-pylab.tight_layout()
-data_ax_h = pylab.gca()
+plt.plot(dataset.X[:, 0], dataset.X[:, 1], 'k.')
+plt.xlabel(dataset.column_names[0])
+plt.ylabel(dataset.column_names[1])
+plt.tight_layout()
+data_ax_h = plt.gca()
+plt.show()
 
 ###############################################################################
 # Setup: Determine specific settings of the proposals
@@ -66,7 +67,7 @@ def show_clusters_over_time(
     '''
     '''
     ncols = int(np.ceil(len(query_laps) // float(nrows)))
-    fig_handle, ax_handle_list = pylab.subplots(
+    fig_handle, ax_handle_list = plt.subplots(
         figsize=(FIG_SIZE[0] * ncols, FIG_SIZE[1] * nrows),
         nrows=nrows, ncols=ncols, sharex=True, sharey=True)
     for plot_id, lap_val in enumerate(query_laps):
@@ -79,7 +80,8 @@ def show_clusters_over_time(
         cur_ax_handle.set_ylabel(dataset.column_names[1])
         cur_ax_handle.set_xlim(data_ax_h.get_xlim())
         cur_ax_handle.set_ylim(data_ax_h.get_ylim())
-    pylab.tight_layout()
+    plt.tight_layout()
+    plt.show()
 
 
 
@@ -157,20 +159,21 @@ show_clusters_over_time(full_info_dict['task_output_path'])
 # Loss function trace plot
 # ------------------------
 #
-pylab.figure()
-pylab.plot(
+plt.figure()
+plt.plot(
     diag1_info_dict['lap_history'][2:],
     diag1_info_dict['loss_history'][2:], 'r.-',
     label='diag_covar fixed')
-pylab.plot(
+plt.plot(
     diag_info_dict['lap_history'][2:],
     diag_info_dict['loss_history'][2:], 'k.-',
     label='diag_covar + moves')
-pylab.plot(
+plt.plot(
     full_info_dict['lap_history'][2:],
     full_info_dict['loss_history'][2:], 'b.-',
     label='full_covar + moves')
-pylab.legend(loc='upper right')
-pylab.xlabel('num. laps')
-pylab.ylabel('loss')
-pylab.tight_layout()
+plt.legend(loc='upper right')
+plt.xlabel('num. laps')
+plt.ylabel('loss')
+plt.tight_layout()
+plt.show()
