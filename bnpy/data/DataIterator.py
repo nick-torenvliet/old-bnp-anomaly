@@ -75,7 +75,7 @@ class DataIterator(object):
 
     def __init__(self, Data, nBatch=10, nLap=10,
                  dataorderseed=42, startLap=0,
-                 alwaysTrackTruth=False, **kwargs):
+                 alwaysTrackTruth=False, ts=True, **kwargs ):
         """ Create an iterator over batches/subsets of a large dataset.
 
         Each batch/subset is represented by an instance of
@@ -121,7 +121,10 @@ class DataIterator(object):
 
         # Randomly assign each unit to exactly one batch
         PRNG = np.random.RandomState(self.dataorderseed)
-        shuffleIDs = PRNG.permutation(nUnit).tolist()
+        if ts:
+            shuffleIDs = list(range(0, nUnit))
+        else:
+            shuffleIDs = PRNG.permutation(nUnit).tolist()
         self.DataPerBatch = list()
         self.IDsPerBatch = list()
         for b in range(nBatch):
@@ -130,10 +133,7 @@ class DataIterator(object):
             Dchunk.alwaysTrackTruth = alwaysTrackTruth
             self.DataPerBatch.append(Dchunk)
             self.IDsPerBatch.append(curBatchMask)
-            # Remove units assigned to this batch
-            # from consideration for future batches
             del shuffleIDs[:nUnitPerBatch[b]]
-
         # Decide which order the batches will be traversed in the first lap
         self.batchOrderCurLap = self.getRandPermOfBatchIDsForCurLap()
 
