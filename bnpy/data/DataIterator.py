@@ -126,7 +126,6 @@ class DataIterator(object):
         self.DataPerBatch = list()
         self.IDsPerBatch = list()
         for b in range(nBatch):
-            pdb.set_trace()
             curBatchMask = shuffleIDs[:nUnitPerBatch[b]]
             Dchunk = Data.make_subset(curBatchMask, doTrackTruth=alwaysTrackTruth)
             Dchunk.alwaysTrackTruth = alwaysTrackTruth
