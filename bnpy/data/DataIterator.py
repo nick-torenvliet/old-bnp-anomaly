@@ -97,6 +97,7 @@ class DataIterator(object):
             and random order for visiting batches during each lap
         """
         self.Data = Data
+        self.ts = ts
 
         if hasattr(Data, 'name'):
             self.name = Data.name
@@ -122,7 +123,7 @@ class DataIterator(object):
 
         # Randomly assign each unit to exactly one batch
         PRNG = np.random.RandomState(self.dataorderseed)
-        if ts:
+        if self.ts:
             shuffleIDs = list(range(0, nUnit))
         else:
             shuffleIDs = PRNG.permutation(nUnit).tolist()
@@ -200,7 +201,11 @@ class DataIterator(object):
         '''
         curseed = int(self.dataorderseed + self.lapID)
         PRNG = np.random.RandomState(curseed)
-        return PRNG.permutation(self.nBatch)
+        if self.ts:
+            perm = np.array(list(range(0, self.nBatch)))
+        else:
+            perm = PRNG.permutation(self.nBatch)
+        return perm
 
     def get_stats_summary(self):
         ''' Returns human-readable summary of this dataset's basic properties
