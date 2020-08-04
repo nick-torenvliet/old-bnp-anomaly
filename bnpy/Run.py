@@ -186,7 +186,7 @@ def _run_task_internal(jobname, taskid, nTask,
         obsModelName=ReqArgs['obsModelName'],
         algName=ReqArgs['algName'],
         KwArgs=KwArgs,
-        verbose=(taskid == 1 or jobID > 0),
+        verbose= (taskid == 1 or jobID > 0),
     )
 
     # Create learning algorithm

@@ -64,7 +64,7 @@ def load_model_at_lap(matfilepath, lapQuery):
         lap checkpoint for saved model closed to lapQuery
     '''
     prefix, bestLap = getPrefixForLapQuery(matfilepath, lapQuery)
-    model = load_model_at_prefix(matfilepath, prefix=prefix)
+    model = load_model(matfilepath, prefix=prefix)
     return model, bestLap
 
 
