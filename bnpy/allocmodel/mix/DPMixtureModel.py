@@ -3,6 +3,7 @@ Bayesian nonparametric mixture model with Dirichlet process prior.
 """
 
 from builtins import *
+from scipy.stats import norm
 import numpy as np
 import pdb
 from bnpy.allocmodel import AllocModel
@@ -915,6 +916,16 @@ class DPMixtureModel(AllocModel):
     # .... end class DPMixtureModel
 
 
+def cohesion(in_arr, nu, beta):
+    num_k = int(nu.size)
+    diff_arr = np.zeros_like(in_arr)
+    diff_arr[1:] = np.diff(in_arr, axis=0)
+    new_arr = diff_arr.repeat(num_k,1) * nu/beta[:,0]
+    # dmean = np.mean(diff_arr)
+    ch_val = norm.pdf(new_arr)
+    return ch_val
+
+
 def calcLocalParams(Data, LP, Elogbeta=None, nnzPerRowLP=None, **kwargs):
     """ Compute local parameters for each data item.
 
@@ -937,6 +948,11 @@ def calcLocalParams(Data, LP, Elogbeta=None, nnzPerRowLP=None, **kwargs):
     """
     lpr = LP['E_log_soft_ev']
     lpr += Elogbeta
+    ### Changes here for cohesion function
+    posterior_nu = kwargs["Post"].nu  # shape K x D array
+    posterior_beta = kwargs["Post"].beta  # shape K x D array
+    g_func = cohesion(Data.X, posterior_nu, posterior_beta)
+    lpr *= g_func
     K = LP['E_log_soft_ev'].shape[1]
     if nnzPerRowLP and (nnzPerRowLP > 0 and nnzPerRowLP < K):
         # SPARSE Assignments

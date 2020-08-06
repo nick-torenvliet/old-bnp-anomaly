@@ -79,7 +79,7 @@ class HModel(object):
             ElapsedTimeLogger.startEvent('local', 'allocupdate')
         # Combine with allocModel probs of each cluster
         # Fills in LP['resp'], N x K array whose rows sum to one
-        LP = self.allocModel.calc_local_params(Data, LP, **kwargs)
+        LP = self.allocModel.calc_local_params(Data, LP, Post=self.obsModel.Post, **kwargs)
         if doLogElapsedTime:
             ElapsedTimeLogger.stopEvent('local', 'allocupdate')
         return LP
