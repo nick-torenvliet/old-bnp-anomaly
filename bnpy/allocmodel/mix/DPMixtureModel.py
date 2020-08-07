@@ -916,14 +916,46 @@ class DPMixtureModel(AllocModel):
     # .... end class DPMixtureModel
 
 
-def cohesion(in_arr, nu, beta):
+def cohesion(in_arr, soft_ev, nu):
     num_k = int(nu.size)
-    diff_arr = np.zeros_like(in_arr)
-    diff_arr[1:] = np.diff(in_arr, axis=0)
-    new_arr = diff_arr.repeat(num_k,1) * nu/beta[:,0]
+    data_arr = in_arr.repeat(num_k, 1)
+
+    assgn_prob = soft_ev - np.max(soft_ev, axis=1)[:,np.newaxis]
+    assgn_prob = np.exp(assgn_prob)
+    assgn_prob /= assgn_prob.sum(axis=1)[:,np.newaxis]
+    assgn = np.argmax(assgn_prob, axis=1)
+
+    one_hot_y = np.eye(num_k, dtype=np.int)
+    one_hot_y = one_hot_y[assgn]
+
+    g_calc = np.ones_like(soft_ev) / num_k
+    for idx in range(num_k):
+        num_data = np.sum(one_hot_y[:,idx])
+        if num_data > 0:
+            D_tk = data_arr[one_hot_y[:,idx], idx]
+            # run_mean = np.cumsum(D_tk) / np.arange(1,num_data+1)
+            dmean = np.mean(D_tk)
+            dstd = np.std(D_tk) + 1e-8
+            g_calc[:,idx] = np.cumprod(norm.pdf((in_arr - dmean)/dstd))
+    return g_calc
+
+
+# def cohesion(in_arr, nu, beta):
+    # num_k = int(nu.size)
+    # diff_arr = np.zeros_like(in_arr)
+    # diff_arr[1:] = np.diff(in_arr, axis=0)
+
+    # assgn_prob = soft_ev - np.max(soft_ev, axis=1)[:,np.newaxis]
+    # assgn_prob = np.exp(assgn_prob)
+    # assgn_prob /= assgn_prob.sum(axis=1)[:,np.newaxis]
+    # assgn = np.argmax(assgn_prob, axis=1)
+
+    # one_hot_y = np.eye(num_k)
+    # one_hot_y = one_hot_y[assgn]
+    # new_arr = diff_arr.repeat(num_k,1) * nu/beta[:,0]
     # dmean = np.mean(diff_arr)
-    ch_val = norm.pdf(new_arr)
-    return ch_val
+    # ch_val = norm.pdf(new_arr)
+    # return ch_val
 
 
 def calcLocalParams(Data, LP, Elogbeta=None, nnzPerRowLP=None, **kwargs):
@@ -950,8 +982,9 @@ def calcLocalParams(Data, LP, Elogbeta=None, nnzPerRowLP=None, **kwargs):
     lpr += Elogbeta
     ### Changes here for cohesion function
     posterior_nu = kwargs["Post"].nu  # shape K x D array
-    posterior_beta = kwargs["Post"].beta  # shape K x D array
-    g_func = cohesion(Data.X, posterior_nu, posterior_beta)
+    # posterior_beta = kwargs["Post"].beta  # shape K x D array
+    # g_func = cohesion(Data.X, posterior_nu, posterior_beta)
+    g_func = cohesion(Data.X, lpr, posterior_nu)
     lpr *= g_func
     K = LP['E_log_soft_ev'].shape[1]
     if nnzPerRowLP and (nnzPerRowLP > 0 and nnzPerRowLP < K):
