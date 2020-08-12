@@ -917,21 +917,12 @@ class DPMixtureModel(AllocModel):
     # .... end class DPMixtureModel
 
 
-def cohesion(in_arr, soft_ev, nu, G):
+def cohesion(in_arr, soft_ev, nu, beta, G):
     if G == 1:
         num_k = int(nu.size)
         diff_arr = np.zeros_like(in_arr)
         diff_arr[1:] = np.diff(in_arr, axis=0)
-
-        assgn_prob = soft_ev - np.max(soft_ev, axis=1)[:,np.newaxis]
-        assgn_prob = np.exp(assgn_prob)
-        assgn_prob /= assgn_prob.sum(axis=1)[:,np.newaxis]
-        assgn = np.argmax(assgn_prob, axis=1)
-
-        one_hot_y = np.eye(num_k)
-        one_hot_y = one_hot_y[assgn]
         new_arr = diff_arr.repeat(num_k,1) * nu/beta[:,0]
-        dmean = np.mean(diff_arr)
         g_calc = norm.pdf(new_arr)
     elif G == 2:
         num_k = int(nu.size)
@@ -983,9 +974,8 @@ def calcLocalParams(Data, LP, G=0, Elogbeta=None, nnzPerRowLP=None, **kwargs):
     lpr += Elogbeta
     ### Changes here for cohesion function
     posterior_nu = kwargs["Post"].nu  # shape K x D array
-    # posterior_beta = kwargs["Post"].beta  # shape K x D array
-    # g_func = cohesion(Data.X, posterior_nu, posterior_beta)
-    g_func = cohesion(Data.X, lpr, posterior_nu, G)
+    posterior_beta = kwargs["Post"].beta  # shape K x D array
+    g_func = cohesion(Data.X, lpr, posterior_nu, posterior_beta, G)
     lpr *= g_func
     K = LP['E_log_soft_ev'].shape[1]
     if nnzPerRowLP and (nnzPerRowLP > 0 and nnzPerRowLP < K):
