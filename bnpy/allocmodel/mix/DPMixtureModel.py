@@ -979,13 +979,14 @@ def calcLocalParams(Data, LP, Elogbeta=None, nnzPerRowLP=None, **kwargs):
             resp[n, k] = p(z[n] = k | x[n])
     """
     lpr = LP['E_log_soft_ev']
-    lpr += Elogbeta
+    # lpr += Elogbeta
     ### Changes here for cohesion function
     posterior_nu = kwargs["Post"].nu  # shape K x D array
     # posterior_beta = kwargs["Post"].beta  # shape K x D array
     # g_func = cohesion(Data.X, posterior_nu, posterior_beta)
     g_func = cohesion(Data.X, lpr, posterior_nu)
     lpr *= g_func
+    lpr += Elogbeta
     K = LP['E_log_soft_ev'].shape[1]
     if nnzPerRowLP and (nnzPerRowLP > 0 and nnzPerRowLP < K):
         # SPARSE Assignments

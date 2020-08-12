@@ -173,8 +173,7 @@ class HModel(object):
     def calcLogLikCollapsedSamplerState(self, SS):
         ''' Compute marginal likelihood of current sampler state.
         '''
-        return self.obsModel.calcMargLik(SS) \
-               + self.allocModel.calcMargLik(SS)
+        return self.obsModel.calcMargLik(SS) + self.allocModel.calcMargLik(SS)
 
     def init_global_params(self, Data, **initArgs):
         ''' Initialize (in-place) global parameters
