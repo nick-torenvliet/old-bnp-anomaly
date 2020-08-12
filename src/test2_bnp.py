@@ -19,9 +19,9 @@ def run_bnp_anomaly(mppack):
     gamma = 1.0
     sF = 1.0
     K = 25  # Initialize K component - this value places a max K the model can develop
-    nLap = 1
+    nLap = 20
     iname='randexamples'
-    opath = f'/tmp/bnp-anomaly/coldstart/{data_set}/b0'  # Dynamic output path according to batch
+    opath = f'/tmp/bnp-anomaly/coldstart/2{data_set}/b0'  # Dynamic output path according to batch
     ll = [np.nan] * window_size_in_batches
     
     data_df = pd.DataFrame(columns =['index', 'data'])
@@ -39,10 +39,10 @@ def run_bnp_anomaly(mppack):
             K=K, 
             moves='birth,merge,delete,shuffle',
             initname=iname,
-            ts=True, debug=False, verbose=0)
+            ts=True, debug=False, verbose=0, G=2)
         
         iname=warm_info_dict['task_output_path']
-        opath = f'/tmp/AsteriskK8/warmstart/{data_set}/b{ii +  1}'
+        opath = f'/tmp/AsteriskK8/warmstart/2{data_set}/b{ii +  1}'
 
         batch = window.make_subset(list(range(batch_size * window_size_in_batches - batch_size, batch_size * window_size_in_batches)))
 
@@ -88,7 +88,7 @@ data_sets = ["./data/test/ds0.csv",
              "./data/test/ds6.csv",
              "./data/test/ds7.csv"
             ]
-data = [pd.read_csv(i, usecols=['0']).head(2000) for i in data_sets]
+data = [pd.read_csv(i, usecols=['0']) for i in data_sets]
 
 for d, df in enumerate(data):
     win = []
