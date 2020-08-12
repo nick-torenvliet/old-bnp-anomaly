@@ -327,7 +327,9 @@ class DiagGaussObsModel(AbstractObsModel):
         m : 1D array, size D
         kappa : positive scalar
         '''
-        return calcPostParamsFromSSForComp(SS, kA, kB)
+        # Passing the prior as required by calcPostParamsFromSSForComp()
+        Prior = self.Prior
+        return calcPostParamsFromSSForComp(SS, kA, kB, Prior)
         '''
         if kB is None:
             SN = SS.N[kA]
