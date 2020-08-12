@@ -31,9 +31,10 @@ import pdb
 
 class HModel(object):
 
-    def __init__(self, allocModel, obsModel):
+    def __init__(self, allocModel, obsModel, G=0):
         ''' Constructor assembles HModel given fully valid subcomponents
         '''
+        self.G = G
         self.allocModel = allocModel
         self.obsModel = obsModel
         self.inferType = allocModel.inferType
@@ -44,14 +45,14 @@ class HModel(object):
 
     @classmethod
     def CreateEntireModel(cls, inferType, allocModelName, obsModelName,
-                          allocPriorDict, obsPriorDict, Data):
+                          allocPriorDict, obsPriorDict, Data, G=0):
         ''' Constructor assembles HModel and all its submodels in one call
         '''
         AllocConstr = AllocModelConstructorsByName[allocModelName]
-        allocModel = AllocConstr(inferType, allocPriorDict)
+        allocModel = AllocConstr(inferType, allocPriorDict, G)
         ObsConstr = ObsModelConstructorsByName[obsModelName]
         obsModel = ObsConstr(inferType, Data=Data, **obsPriorDict)
-        return cls(allocModel, obsModel)
+        return cls(allocModel, obsModel, G)
 
     def copy(self):
         ''' Create a clone of this object with distinct memory allocation

@@ -11,7 +11,7 @@ data_init_size = 1800
 batch_size = 200
 batchnum = int(data_init_size/batch_size)
 
-all_data = pd.read_csv('../data/anomaly0245.csv')
+all_data = pd.read_csv('./data/anomaly0245.txt')
 all_data.drop(all_data.columns[0], inplace=True, axis=1)
 
 init_data = all_data.head(data_init_size)
@@ -47,7 +47,7 @@ cold_start_model, cold_info_dict = bnpy.run(
     output_path='/tmp/AsteriskK8/coldstart-K=10/',
     nLap=nLap, nTask=1, nBatch=batchnum, convergeThr=0.0001,
     gamma0=gamma, sF=sF, ECovMat='eye',
-    K=K, initname='randexamplesbydist', ts=True)
+    K=K, initname='randexamplesbydist', ts=True, G=2)
 
 # Get the intial graphing data
 y = np.squeeze(init_data.X)
@@ -86,7 +86,7 @@ for i in range(int(data_init_size/batch_size), len(batches)):
         output_path='/tmp/AsteriskK8/warmstart-K=10/',
         nLap=nLap, nTask=1, nBatch=batchnum, convergeThr=0.0001,
         gamma0=gamma, sF=sF, ECovMat='eye',
-        K=K, initname=cold_info_dict['task_output_path'], ts=True)#     trained_model, trained_dict = bnpy.run(
+        K=K, initname=cold_info_dict['task_output_path'], ts=True, G=2)#     trained_model, trained_dict = bnpy.run(
        
     # Check sufficient statistics on the new batch with the newly learned model 
     LPanomaly = []
