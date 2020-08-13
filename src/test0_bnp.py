@@ -88,7 +88,7 @@ data_sets = ["./data/test/ds0.csv",
              "./data/test/ds6.csv",
              "./data/test/ds7.csv"
             ]
-data = [pd.read_csv(i, usecols=['0']).head(1000) for i in data_sets]
+data = [pd.read_csv(i, usecols=['0']).head(10000) for i in data_sets]
 
 for d, df in enumerate(data):
     win = []
