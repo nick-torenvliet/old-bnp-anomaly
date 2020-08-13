@@ -42,7 +42,7 @@ def run_bnp_anomaly(mppack):
             ts=True, debug=False, verbose=0, G=0)
         
         iname=warm_info_dict['task_output_path']
-        opath = f'/tmp/AsteriskK8/warmstart/0{data_set}/b{ii +  1}'
+        opath = f'/tmp/bnp-anomaly/warmstart/0{data_set}/b{ii +  1}'
 
         batch = window.make_subset(list(range(batch_size * window_size_in_batches - batch_size, batch_size * window_size_in_batches)))
 
