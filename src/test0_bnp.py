@@ -12,9 +12,6 @@ window_size_in_batches = 5
 windows = []
 
 def run_bnp_anomaly(mppack):
-#     type(w[0][0][0])
-# <class 'pandas.core.series.Series'>
-# type(w[0][0][1])
     windows = mppack[0]
     batch_size = mppack[1]
     window_size_in_batches = mppack[2]
@@ -68,22 +65,20 @@ def run_bnp_anomaly(mppack):
         ll_normed = [i/sum(ll) for i in ll]
         entropy = -sum([i*np.log(i) for i in ll_normed])
 
-        index = df_index[-1:]
+        approx_ll = warm_start_model.calc_evidence(batch)
+
+        index = np.array(df_index.iloc[-1], dtype=int)
         x = df_index[len(df_index) - batch_size:]
-        data_df = data_df.append({'x':x, 'y':batch.X.reshape((batch_size,))}, ignore_index=True)
-        calc_df = calc_df.append({'index':index.iloc[0], 'LL':LL, 'entropy':entropy}, ignore_index=True)
-        print('holdup')
-#    results_df.set_index('index', inplace=True)
-#    data_df.set_index('index', inplace=True)
+        xx = df_index[-1:]
+        data_df = data_df.append(pd.DataFrame({'x':x, 'y':batch.X.reshape((batch_size,))}), ignore_index=True)
+        calc_df = calc_df.append(pd.DataFrame({'x':xx, 'LL':LL, 'entropy':entropy, 'approx_LL':approx_ll}), ignore_index=True)
+
     ds = data_set[0] + "." + data_set[1]
-    data_n = "data/test_output/" + ds + "_data" + str(G) +  "_bs" + str(batch_size) \
-                + "_wsib" + str(window_size_in_batches) + ".csv"
-    calc_n = "data/test_output/" + ds + "_calc" + str(G) +  "_bs" + str(batch_size) \
-                + "_wsib" + str(window_size_in_batches) + ".csv"
-    data_df.to_csv(data_n)
-    results_df.to_csv(calc_n)
-    print("XXX wrote " + data_n)
-    print("XXX wrote " + calc_n)
+    name = "data/test_output/" + ds + "_alg-" + str(G) +  "_bs-" + str(batch_size) \
+                + "_wsib-" + str(window_size_in_batches) + ".csv"
+    data_df.set_index('x', inplace=True)
+    calc_df.set_index('x', inplace=True)
+    pd.concat([data_df, calc_df],axis=1, sort=False).to_csv(name)
     return 0
 
 G=0
@@ -105,9 +100,9 @@ for d, df in enumerate(data):
     windows.append([win, batch_size, window_size_in_batches, test_data_names[d], G])
 
 
-# pool =  mp.Pool(mp.cpu_count())
-# results = pool.map(run_bnp_anomaly, windows)
-# pool.close()
+pool =  mp.Pool(mp.cpu_count())
+results = pool.map(run_bnp_anomaly, windows)
+pool.close()
 
 for w in windows:
     run_bnp_anomaly(w)
