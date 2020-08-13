@@ -41,7 +41,7 @@ Log.setLevel(logging.DEBUG)
 
 def run(dataName=None, allocModelName=None, obsModelName=None, algName=None,
         doSaveToDisk=True, doWriteStdOut=True,
-        taskID=None, **kwargs):
+        taskID=None, G=0, **kwargs):
     """ Fit specified model to data with learning algorithm.
 
         Args
@@ -93,7 +93,7 @@ def run(dataName=None, allocModelName=None, obsModelName=None, algName=None,
                                                ReqArgs, KwArgs, UnkArgs,
                                                dataName, allocModelName,
                                                obsModelName, algName,
-                                               doSaveToDisk, doWriteStdOut)
+                                               doSaveToDisk, doWriteStdOut, G)
         if (taskid == starttaskid or info_dict['loss'] < best_loss):
             bestModel = hmodel
             best_loss = info_dict['loss']
@@ -104,7 +104,7 @@ def run(dataName=None, allocModelName=None, obsModelName=None, algName=None,
 def _run_task_internal(jobname, taskid, nTask,
                        ReqArgs, KwArgs, UnkArgs,
                        dataName, allocModelName, obsModelName, algName,
-                       doSaveToDisk, doWriteStdOut):
+                       doSaveToDisk, doWriteStdOut, G=0):
     """ Internal method (should never be called by end-user!)
         Executes learning for a particular job and particular taskid.
 
@@ -180,6 +180,7 @@ def _run_task_internal(jobname, taskid, nTask,
     # Create and initialize model parameters
     hmodel = make_initialized_model(
         InitData,
+        G=G,
         seed=algseed,
         taskid=taskid,
         allocModelName=ReqArgs['allocModelName'],
@@ -344,6 +345,7 @@ def showWarningForUnknownArgs(UnkArgs, DataArgs=dict()):
 
 def make_initialized_model(
         Data,
+        G=2,
         allocModelName='FiniteMixtureModel',
         obsModelName='Gauss',
         algName='VB',
@@ -378,7 +380,7 @@ def make_initialized_model(
 
     hmodel = bnpy.HModel.CreateEntireModel(
         algName, allocModelName, obsModelName,
-        allocPriorArgsDict, obsPriorArgsDict, Data)
+        allocPriorArgsDict, obsPriorArgsDict, Data, G)
     if verbose:
         Log.info(hmodel.get_model_info())
         Log.info("Initialization:")

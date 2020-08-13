@@ -4,4 +4,8 @@ jupyter lab --no-browser --port 8888 --ip 0.0.0.0 --allow-root
 
 https://stackoverflow.com/questions/32279351/connect-to-remote-kernel-on-aws-using-local-qtconsole
 
+tail -f out.txt | grep --line-buffered XXX
 
+nohup python src/test0_bnp.py > 0.txt &
+
+cat ds7.csv | parallel --header : --pipe -N10000 'cat >ds7_{#}.csv'
