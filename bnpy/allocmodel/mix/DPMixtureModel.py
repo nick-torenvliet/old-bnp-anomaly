@@ -921,19 +921,9 @@ class DPMixtureModel(AllocModel):
 def cohesion(in_arr, assgn_prob, nu, beta, G):
     if G == 1:
         num_k = int(nu.size)
-        diff_arr = np.zeros_like(in_arr)
-        diff_arr[1:] = np.diff(in_arr, axis=0)
-        new_arr = diff_arr.repeat(num_k,1)
-        g_calc = norm.logpdf(new_arr)
-    elif G == 2:
-        num_k = int(nu.size)
         data_arr = in_arr.repeat(num_k, 1)
 
-        # assgn_prob = soft_ev - np.max(soft_ev, axis=1)[:,np.newaxis]
-        # assgn_prob = np.exp(assgn_prob)
-        # assgn_prob /= assgn_prob.sum(axis=1)[:,np.newaxis]
         assgn = np.argmax(assgn_prob, axis=1)
-
         one_hot_y = np.eye(num_k, dtype=np.int)
         one_hot_y = one_hot_y[assgn]
 
@@ -942,12 +932,26 @@ def cohesion(in_arr, assgn_prob, nu, beta, G):
             num_data = np.sum(one_hot_y[:,idx])
             if num_data > 0:
                 D_tk = data_arr[one_hot_y[:,idx], idx]
-                # run_mean = np.cumsum(D_tk) / np.arange(1,num_data+1)
+                dmean = np.mean(D_tk)
+                dstd = np.std(D_tk) + 1e-8
+                g_calc[:,idx] = np.cumsum(norm.logpdf(in_arr, dmean, dstd))
+    elif G == 2:
+        num_k = int(nu.size)
+        data_arr = in_arr.repeat(num_k, 1)
+
+        assgn = np.argmax(assgn_prob, axis=1)
+        one_hot_y = np.eye(num_k, dtype=np.int)
+        one_hot_y = one_hot_y[assgn]
+
+        g_calc = np.ones_like(assgn_prob) / num_k
+        for idx in range(num_k):
+            num_data = np.sum(one_hot_y[:,idx])
+            if num_data > 0:
+                D_tk = data_arr[one_hot_y[:,idx], idx]
                 dmean = np.mean(D_tk)
                 dstd = np.std(D_tk) + 1e-8
                 df = num_data -1 if num_data > 1 else 1
-                # g_calc[:,idx] = np.cumsum(student_t.logcdf(in_arr, df, dmean, dstd))
-                g_calc[:,idx] = np.cumsum(norm.logpdf(in_arr, dmean, dstd))
+                g_calc[:,idx] = np.cumsum(student_t.logpdf(in_arr, df, dmean, dstd))
     else:
         g_calc = 0
     return g_calc
