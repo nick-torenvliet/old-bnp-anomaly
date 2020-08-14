@@ -105,5 +105,5 @@ pool =  mp.Pool(mp.cpu_count())
 results = pool.map(run_bnp_anomaly, windows)
 pool.close()
 
-for w in windows:
-    run_bnp_anomaly(w)
+# for w in windows:
+#     run_bnp_anomaly(w)
