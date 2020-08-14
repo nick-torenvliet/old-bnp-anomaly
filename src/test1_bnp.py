@@ -8,8 +8,8 @@ import time
 from glob import glob
 
 G=1
-batch_size = 50
-window_size_in_batches = 20
+batch_size = 5
+window_size_in_batches = 5
 windows = []
 
 def run_bnp_anomaly(mppack):
@@ -70,7 +70,7 @@ def run_bnp_anomaly(mppack):
         approx_ll = warm_start_model.calc_evidence(batch)
         a_ll.pop(0)
         a_ll.append(approx_ll)
-        a_ll_normed = [i/sum(a_ll) + 1e10 for i in a_ll]
+        a_ll_normed = [i/sum(a_ll) + 1e-10 for i in a_ll]
         entropy_a_ll = -sum([i*np.log(i) for i in a_ll_normed])
   
         index = np.array(df_index.iloc[-1], dtype=int)
