@@ -29,7 +29,8 @@ def run_bnp_anomaly(mppack):
     iname='randexamples'
     opath = f'/tmp/bnp-anomaly/coldstart/{G}/{ds}/b0'  # Dynamic output path according to batch
     ll = [np.nan] * window_size_in_batches
-    
+    a_ll = [np.nan] * window_size_in_batches
+
     data_df = pd.DataFrame()
     calc_df = pd.DataFrame()
     
@@ -59,20 +60,24 @@ def run_bnp_anomaly(mppack):
 
         LP = warm_start_model.calc_local_params(batch)
         SS = warm_start_model.get_global_suff_stats(batch, LP)
-        LL = warm_start_model.calcLogLikCollapsedSamplerState(SS)
 
+        LL = warm_start_model.calcLogLikCollapsedSamplerState(SS)
         ll.pop(0)
         ll.append(LL)
         ll_normed = [i/sum(ll) + 1e10 for i in ll]
-        entropy = -sum([i*np.log(i) for i in ll_normed])
+        entropy_ll = -sum([i*np.log(i) for i in ll_normed])
 
         approx_ll = warm_start_model.calc_evidence(batch)
-
+        a_ll.pop(0)
+        a_ll.append(approx_ll)
+        a_ll_normed = [i/sum(a_ll) + 1e10 for i in a_ll]
+        entropy_a_ll = -sum([i*np.log(i) for i in a_ll_normed])
+  
         index = np.array(df_index.iloc[-1], dtype=int)
         x = df_index[len(df_index) - batch_size:]
         xx = df_index[-1:]
         data_df = data_df.append(pd.DataFrame({'x':x, 'y':batch.X.reshape((batch_size,))}), ignore_index=True)
-        calc_df = calc_df.append(pd.DataFrame({'x':xx, 'LL':LL, 'entropy':entropy, 'approx_LL':approx_ll}), ignore_index=True)
+        calc_df = calc_df.append(pd.DataFrame({'x':xx, 'll':LL, 'a_ll':approx_ll, 'e_ll':entropy_ll, 'e_a_ll':entropy_a_ll}), ignore_index=True)
 
     ds = data_set[0] + "." + data_set[1]
     name = "data/test_output/" + ds + "_alg-" + str(G) +  "_bs-" + str(batch_size) \
