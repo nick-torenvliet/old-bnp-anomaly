@@ -104,7 +104,5 @@ for d, df in enumerate(data):
 
 for w in windows:
     run_bnp_anomaly(w)
-    w[4]=1
-    run_bnp_anomaly(w)
     w[4]=2
     run_bnp_anomaly(w)

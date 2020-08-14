@@ -9,7 +9,7 @@ from glob import glob
 
 G=0
 batch_size = 30
-window_size_in_batches = 10
+window_size_in_batches = 30
 windows = []
 
 def run_bnp_anomaly(mppack):
