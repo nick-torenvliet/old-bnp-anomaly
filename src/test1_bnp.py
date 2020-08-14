@@ -8,8 +8,8 @@ import time
 from glob import glob
 
 G=1
-batch_size = 5
-window_size_in_batches = 5
+batch_size = 50
+window_size_in_batches = 20
 windows = []
 
 def run_bnp_anomaly(mppack):
