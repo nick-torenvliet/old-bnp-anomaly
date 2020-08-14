@@ -84,7 +84,7 @@ def run_bnp_anomaly(mppack):
 
 
 test_data_dir = "data/test/"
-test_data_files = sorted(glob(test_data_dir + '/ds01*.*.csv'))
+test_data_files = sorted(glob(test_data_dir + '/*.*.csv'))
 test_data_names = [i.split("/")[2].split(".")[0:2] for i in test_data_files]
 data = [pd.read_csv(i) for i in test_data_files]
 
