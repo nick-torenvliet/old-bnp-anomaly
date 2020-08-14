@@ -8,8 +8,8 @@ import time
 from glob import glob
 
 G=2
-batch_size = 5
-window_size_in_batches = 5
+batch_size = 30
+window_size_in_batches = 10
 windows = []
 
 def run_bnp_anomaly(mppack):
@@ -64,7 +64,7 @@ def run_bnp_anomaly(mppack):
         LL = warm_start_model.calcLogLikCollapsedSamplerState(SS)
         ll.pop(0)
         ll.append(LL)
-        ll_normed = [i/sum(ll) + 1e10 for i in ll]
+        ll_normed = [i/sum(ll) + 1e-10 for i in ll]
         entropy_ll = -sum([i*np.log(i) for i in ll_normed])
 
         approx_ll = warm_start_model.calc_evidence(batch)
