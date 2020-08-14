@@ -63,7 +63,7 @@ def run_bnp_anomaly(mppack):
 
         ll.pop(0)
         ll.append(LL)
-        ll_normed = [i/sum(ll) for i in ll]
+        ll_normed = [i/sum(ll) + 1e10 for i in ll]
         entropy = -sum([i*np.log(i) for i in ll_normed])
 
         approx_ll = warm_start_model.calc_evidence(batch)
