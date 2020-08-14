@@ -4,6 +4,7 @@ Bayesian nonparametric mixture model with Dirichlet process prior.
 
 from builtins import *
 from scipy.stats import norm
+from scipy.stats import t as student_t
 import numpy as np
 import pdb
 from bnpy.allocmodel import AllocModel
@@ -917,26 +918,26 @@ class DPMixtureModel(AllocModel):
     # .... end class DPMixtureModel
 
 
-def cohesion(in_arr, soft_ev, nu, beta, G):
+def cohesion(in_arr, assgn_prob, nu, beta, G):
     if G == 1:
         num_k = int(nu.size)
         diff_arr = np.zeros_like(in_arr)
         diff_arr[1:] = np.diff(in_arr, axis=0)
-        new_arr = diff_arr.repeat(num_k,1) * nu/beta[:,0]
-        g_calc = norm.pdf(new_arr)
+        new_arr = diff_arr.repeat(num_k,1)
+        g_calc = norm.logpdf(new_arr)
     elif G == 2:
         num_k = int(nu.size)
         data_arr = in_arr.repeat(num_k, 1)
 
-        assgn_prob = soft_ev - np.max(soft_ev, axis=1)[:,np.newaxis]
-        assgn_prob = np.exp(assgn_prob)
-        assgn_prob /= assgn_prob.sum(axis=1)[:,np.newaxis]
+        # assgn_prob = soft_ev - np.max(soft_ev, axis=1)[:,np.newaxis]
+        # assgn_prob = np.exp(assgn_prob)
+        # assgn_prob /= assgn_prob.sum(axis=1)[:,np.newaxis]
         assgn = np.argmax(assgn_prob, axis=1)
 
         one_hot_y = np.eye(num_k, dtype=np.int)
         one_hot_y = one_hot_y[assgn]
 
-        g_calc = np.ones_like(soft_ev) / num_k
+        g_calc = np.ones_like(assgn_prob) / num_k
         for idx in range(num_k):
             num_data = np.sum(one_hot_y[:,idx])
             if num_data > 0:
@@ -944,9 +945,11 @@ def cohesion(in_arr, soft_ev, nu, beta, G):
                 # run_mean = np.cumsum(D_tk) / np.arange(1,num_data+1)
                 dmean = np.mean(D_tk)
                 dstd = np.std(D_tk) + 1e-8
-                g_calc[:,idx] = np.cumprod(norm.pdf((in_arr - dmean)/dstd))
+                df = num_data -1 if num_data > 1 else 1
+                # g_calc[:,idx] = np.cumsum(student_t.logcdf(in_arr, df, dmean, dstd))
+                g_calc[:,idx] = np.cumsum(norm.logpdf(in_arr, dmean, dstd))
     else:
-        g_calc = 1
+        g_calc = 0
     return g_calc
 
 
@@ -971,12 +974,6 @@ def calcLocalParams(Data, LP, G=0, Elogbeta=None, nnzPerRowLP=None, **kwargs):
             resp[n, k] = p(z[n] = k | x[n])
     """
     lpr = LP['E_log_soft_ev']
-    # lpr += Elogbeta
-    ### Changes here for cohesion function
-    posterior_nu = kwargs["Post"].nu  # shape K x D array
-    posterior_beta = kwargs["Post"].beta  # shape K x D array
-    g_func = cohesion(Data.X, lpr, posterior_nu, posterior_beta, G)
-    lpr *= g_func
     lpr += Elogbeta
     K = LP['E_log_soft_ev'].shape[1]
     if nnzPerRowLP and (nnzPerRowLP > 0 and nnzPerRowLP < K):
@@ -989,6 +986,13 @@ def calcLocalParams(Data, LP, G=0, Elogbeta=None, nnzPerRowLP=None, **kwargs):
         # Calculate exp in numerically stable manner (first subtract the max)
         #  perform this in-place so no new allocations occur
         NumericUtil.inplaceExpAndNormalizeRows(lpr)
+        ### Changes here for cohesion function
+        if G > 0:
+            posterior_nu = kwargs["Post"].nu  # shape K x D array
+            posterior_beta = kwargs["Post"].beta  # shape K x D array
+            g_func = cohesion(Data.X, lpr, posterior_nu, posterior_beta, G)
+            lpr = np.log(lpr) + g_func
+            NumericUtil.inplaceExpAndNormalizeRows(lpr)
         LP['resp'] = lpr
     return LP
 
