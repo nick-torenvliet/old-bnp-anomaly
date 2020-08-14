@@ -7,6 +7,7 @@ import os
 import time
 from glob import glob
 
+G=1
 batch_size = 5
 window_size_in_batches = 5
 windows = []
@@ -26,7 +27,7 @@ def run_bnp_anomaly(mppack):
     ds = data_set[0] + "." + data_set[1]
 
     iname='randexamples'
-    opath = f'/tmp/bnp-anomaly/coldstart/{ds}/b0'  # Dynamic output path according to batch
+    opath = f'/tmp/bnp-anomaly/coldstart/{G}/{ds}/b0'  # Dynamic output path according to batch
     ll = [np.nan] * window_size_in_batches
     
     data_df = pd.DataFrame()
@@ -52,7 +53,7 @@ def run_bnp_anomaly(mppack):
             ts=True, debug=False, verbose=0, G=G)
         
         iname=warm_info_dict['task_output_path']
-        opath = f'/tmp/bnp-anomaly/warmstart/{ds}/b{ii +  1}'
+        opath = f'/tmp/bnp-anomaly/warmstart/{G}/{ds}/b{ii +  1}'
 
         batch = xdata_data.make_subset(list(range(batch_size * window_size_in_batches - batch_size, batch_size * window_size_in_batches)))
 
@@ -81,7 +82,7 @@ def run_bnp_anomaly(mppack):
     pd.concat([data_df, calc_df],axis=1, sort=False).to_csv(name)
     return 0
 
-G=1
+
 test_data_dir = "data/test/"
 test_data_files = sorted(glob(test_data_dir + '/ds01*.*.csv'))
 test_data_names = [i.split("/")[2].split(".")[0:2] for i in test_data_files]
