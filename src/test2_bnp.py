@@ -8,7 +8,7 @@ import time
 from glob import glob
 
 G=2
-batch_size = 15
+batch_size = 5
 window_size_in_batches = 5
 windows = []
 
