@@ -189,3 +189,4 @@ Michael C. Hughes and Erik B. Sudderth. Probabilistic Programming Workshop at NI
 
 Primarly, we intend **bnpy** to be a platform for researchers. 
 By gathering many learning algorithms and popular models in one convenient, modular repository, we hope to make it easier to compare and contrast approaches. We also hope that the modular organization of **bnpy** enables researchers to try out new modeling ideas without reinventing the wheel.
+# old-bnp-anomaly
